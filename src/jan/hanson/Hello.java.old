@@ -1,0 +1,74 @@
+package jan.hanson;
+
+import java.io.*;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+@SuppressWarnings("serial")
+public class Hello extends HttpServlet
+{
+//	private ResultSet results;
+	
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+    	ResultSet sResults;
+    	ResultSet vResults;
+    	ResultSet pResults;
+    	ResultSet aResults;
+        String simpleQuery 	= req.getParameter("sQuery");
+        String videoQuery	= req.getParameter("vQuery");
+        String picQuery		= req.getParameter("pQuery");
+        String audioQuery 	= req.getParameter("aQuery");
+        
+        PrintWriter out = resp.getWriter();
+
+        out.println("<html>");
+        out.println("<body>");
+        out.println("The paramter sQuery was \"" + simpleQuery + "\".");
+        out.println("The paramter vQuery was \"" + videoQuery + "\".");
+        out.println("The paramter pQuery was \"" + picQuery + "\".");
+        out.println("The paramter aQuery was \"" + audioQuery + "\".");
+        
+        JDBCQueryConnector query = new JDBCQueryConnector();
+        try {
+			query.openDBConnection
+					("org.mariadb.jdbc.Driver", 
+					"jdbc:mysql://localhost:3306/testdb", 
+					"root", 
+					"b4b00n6.63e-34{}[]");
+			sResults = query.executeQuery(simpleQuery);
+			vResults = query.executeQuery(videoQuery);
+			pResults = query.executeQuery(picQuery);
+			aResults = query.executeQuery(audioQuery);
+			query.closeDBConnection();
+			
+			while(sResults.next())
+			{
+			out.println("</br>");
+			out.println(sResults.getInt(1));
+			out.println(sResults.getString(2));
+			}
+		} 
+        catch (SQLException | ClassNotFoundException e) 
+        {System.out.println(e);}
+        
+        out.println("</body>");
+        out.println("</html>");
+    }
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        String field = req.getParameter("field");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<html>");
+        out.println("<body>");
+        out.println("You entered \"" + field + "\" into the text box.");
+        out.println("</body>");
+        out.println("</html>");
+    }
+}
